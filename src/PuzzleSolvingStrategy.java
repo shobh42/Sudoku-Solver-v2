@@ -1,10 +1,14 @@
-public class PuzzleSolvingStrategy {
+import java.util.List;
 
-    public final void solve(Cell[][] puzzle){
+public abstract class PuzzleSolvingStrategy {
 
-        loopThroughAllCell();
-        findTheCell();
-        checkTheValueIsPresent();
-        removeTheValue();
+    public final void solve(Cell[][] sudokuPuzzle){
+
+        List<Cell> cellToBeFilled = findCells(sudokuPuzzle);
+        //findTheCell();
+        //checkTheValueIsPresent();
+        //removeTheValue();
     }
+
+    public abstract List<Cell>findCells(Cell[][] sudokuPuzzle);
 }
