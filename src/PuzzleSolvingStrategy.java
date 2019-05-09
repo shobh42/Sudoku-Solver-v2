@@ -2,13 +2,16 @@ import java.util.List;
 
 public abstract class PuzzleSolvingStrategy {
 
-    public final void solve(Cell[][] sudokuPuzzle){
+    public final boolean solve(Cell[][] sudokuPuzzle){
 
-        List<Cell> cellToBeFilled = findCells(sudokuPuzzle);
-        //findTheCell();
-        //checkTheValueIsPresent();
-        //removeTheValue();
+        List<CellCoordinate> cellWithCandidate = findCellCoordinates(sudokuPuzzle);
+        List<CellCoordinate> cellContainingCandidate = checkCandidateIsPresent(cellWithCandidate, sudokuPuzzle);
+        return removeTheCandidate(cellContainingCandidate);
     }
 
-    public abstract List<Cell>findCells(Cell[][] sudokuPuzzle);
+    public abstract List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle);
+
+    public abstract List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellWithCandidate, Cell[][] sudokuPuzzle);
+
+    public abstract boolean removeTheCandidate(List<CellCoordinate> cellContainingCandidate);
 }

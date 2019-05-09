@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class BlockEliminationStrategy extends EliminationStrategy {
+public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
 
     private int count;
     private double totalTime;
@@ -11,6 +11,39 @@ public class BlockEliminationStrategy extends EliminationStrategy {
     public BlockEliminationStrategy(){
         count = 0;
         totalTime = 0;
+    }
+
+    @Override
+    public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
+        List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
+        int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
+        for(int row = 0; row < sudokuPuzzle.length; row+=sqrt){
+
+            for(int col = 0; col < sudokuPuzzle.length; col+=sqrt){
+
+                for(int currentBlockRow = row; currentBlockRow < row + sqrt; currentBlockRow++){
+
+                    for(int currentBlockCol = col; currentBlockCol < col + sqrt; currentBlockCol++){
+
+                        if(sudokuPuzzle[currentBlockRow][currentBlockCol].getSize() == 1){
+                            cellWithSizeOne.add(new CellCoordinate(row, col));
+                        }
+                    }
+                }
+            }
+        }
+
+        return cellWithSizeOne;
+    }
+
+    @Override
+    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellToBeFilled, Cell[][] sudokuPuzzle) {
+        return null;
+    }
+
+    @Override
+    public boolean removeTheCandidate(List<CellCoordinate> cellContainingCandidate) {
+        return false;
     }
 
     public int getCount() {
@@ -88,28 +121,5 @@ public class BlockEliminationStrategy extends EliminationStrategy {
 
     public String toString(){
         return "Block Elimination has eliminated " + count + " and has taken " + totalTime/1000;
-    }
-
-    @Override
-    public List<Cell> findCells(Cell[][] sudokuPuzzle) {
-        List<Cell> cellWithSizeOne = new ArrayList<>();
-        int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
-        for(int row = 0; row < sudokuPuzzle.length; row+=sqrt){
-
-            for(int col = 0; col < sudokuPuzzle.length; col+=sqrt){
-
-                for(int currentBlockRow = row; currentBlockRow < row + sqrt; currentBlockRow++){
-
-                    for(int currentBlockCol = col; currentBlockCol < col + sqrt; currentBlockCol++){
-
-                        if(sudokuPuzzle[currentBlockRow][currentBlockCol].getSize() == 1){
-                            cellWithSizeOne.add(sudokuPuzzle[currentBlockRow][currentBlockCol]);
-                        }
-                    }
-                }
-            }
-        }
-
-        return cellWithSizeOne;
     }
 }

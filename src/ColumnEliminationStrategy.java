@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class ColumnEliminationStrategy extends EliminationStrategy {
+public class ColumnEliminationStrategy extends PuzzleSolvingStrategy {
     private int count;
     private double totalTime;
 
@@ -11,19 +11,29 @@ public class ColumnEliminationStrategy extends EliminationStrategy {
     }
 
     @Override
-    public List<Cell> findCells(Cell[][] sudokuPuzzle) {
-        List<Cell> cellWithSizeOne = new ArrayList<>();
+    public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
+        List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
         for(int col = 0; col < sudokuPuzzle.length; col++){
 
             for(int row = 0; row < sudokuPuzzle.length; row++){
 
                 if(sudokuPuzzle[row][col].getSize() == 1){
-                    cellWithSizeOne.add(sudokuPuzzle[row][col]);
+                    cellWithSizeOne.add(new CellCoordinate(row, col));
                 }
             }
         }
 
         return cellWithSizeOne;
+    }
+
+    @Override
+    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellToBeFilled, Cell[][] sudokuPuzzle) {
+        return null;
+    }
+
+    @Override
+    public boolean removeTheCandidate(List<CellCoordinate> cellContainingCandidate) {
+        return false;
     }
 //    @Override
 //    public boolean solve(int size, Cell[][] puzzle) {
