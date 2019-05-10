@@ -6,7 +6,7 @@ import java.util.List;
 public class SudokuSolver {
 
     private Cell[][] sudokuPuzzle;
-    private List<SolvingStrategy> solvingStrategies;
+    private List<PuzzleSolvingStrategy> solvingStrategies;
     private SudokuPuzzleGenerator puzzleGenerator;
     private List<SolvedPuzzle> solvedPuzzle;
     private Enum state;
@@ -20,7 +20,8 @@ public class SudokuSolver {
 
     private void initializeStrategy() {
         solvingStrategies = Arrays.asList(new RowEliminationStrategy(), new ColumnEliminationStrategy(),
-                new BlockEliminationStrategy(), new HiddenSingleStrategy(), new BoxReductionStrategy(), new NakedPairStrategy());
+                new BlockEliminationStrategy());
+                //new HiddenSingleStrategy(), new BoxReductionStrategy(), new NakedPairStrategy());
 
     }
 
@@ -47,7 +48,7 @@ public class SudokuSolver {
         int strategyNumber = 0;
         boolean puzzleIsSolved = false;
         while(!puzzleIsSolved && strategyNumber < solvingStrategies.size()){
-            if(solvingStrategies.get(strategyNumber).solve(size, sudokuPuzzle)){
+            if(solvingStrategies.get(strategyNumber).solve(sudokuPuzzle)){
                 strategyNumber = 0;
             }else{
                 strategyNumber++;

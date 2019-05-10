@@ -25,6 +25,7 @@ public class RowEliminationStrategy extends PuzzleSolvingStrategy
 
     @Override
     public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
+        System.out.println("Inside Row Elimination");
         List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
         for(int row = 0; row < sudokuPuzzle.length; row++){
 
@@ -40,33 +41,42 @@ public class RowEliminationStrategy extends PuzzleSolvingStrategy
     }
 
     @Override
-    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellWithCandidate, Cell[][] sudokuPuzzle) {
-        List<CellCoordinate> cellWithCandidateToRemove = new ArrayList<>();
-        for(CellCoordinate cell: cellWithCandidate){
+    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellToUseForElimination, Cell[][] sudokuPuzzle) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
+        for(CellCoordinate cell: cellToUseForElimination){
 
             char candidate = (Character) sudokuPuzzle[cell.getRow()][cell.getCol()].getCandidates().toArray()[0];
             int candidateRow = cell.getRow();
-            int candidateCol = cell.getCol();
             for(int col = 0; col < sudokuPuzzle.length; col++){
                 if(sudokuPuzzle[candidateRow][col].getCandidates().size() > 1
                         && sudokuPuzzle[candidateRow][col].getCandidates().contains(candidate)){
-                    cellWithCandidateToRemove.add(new CellCoordinate(candidateRow, col));
-                }
-            }
-
-            for(int row = 0; row < sudokuPuzzle.length; row++){
-                if(sudokuPuzzle[row][candidateCol].getCandidates().size() > 1
-                        && sudokuPuzzle[row][candidateCol].getCandidates().contains(candidate)){
-                    cellWithCandidateToRemove.add(new CellCoordinate(row, candidateCol));
+                    cellToUpdate.add(new CellCoordinate(candidateRow, col, candidate));
                 }
             }
         }
 
-        return cellWithCandidateToRemove;
+        return cellToUpdate;
     }
 
     @Override
-    public boolean removeTheCandidate(List<CellCoordinate> cellContainingCandidate) {
-        return false;
+    public boolean removeTheCandidate(List<CellCoordinate> cellToUpdate, Cell[][] sudokuPuzzle) {
+        boolean stateChanged = false;
+        for (CellCoordinate cell: cellToUpdate){
+
+            int row = cell.getRow();
+            int col = cell.getCol();
+            if(sudokuPuzzle[row][col].getSize() == 1){
+                continue;
+            }
+
+            Character candidate = (Character) cell.getCandidate();
+            sudokuPuzzle[row][col].getCandidates().remove(candidate);
+            stateChanged = true;
+            if(sudokuPuzzle[row][col].getSize() == 1){
+                count++;
+            }
+        }
+
+        return stateChanged;
     }
 }

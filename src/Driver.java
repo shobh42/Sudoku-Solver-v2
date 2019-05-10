@@ -14,7 +14,7 @@ public class Driver {
            for(SolvedPuzzle puzzle : solvedPuzzle){
                printPuzzle(puzzle.getSolvedPuzzle());
            }
-            for(SolvingStrategy strategy: solvedPuzzle.get(0).strategiesInfo()){
+            for(PuzzleSolvingStrategy strategy: solvedPuzzle.get(0).strategiesInfo()){
                 System.out.println(strategy.toString());
                 System.out.println();
             }

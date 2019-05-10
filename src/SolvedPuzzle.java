@@ -4,9 +4,9 @@ import java.util.List;
 public class SolvedPuzzle {
 
     private Cell[][] puzzle;
-    private List<SolvingStrategy> strategiesInfo;
+    private List<PuzzleSolvingStrategy> strategiesInfo;
 
-    public SolvedPuzzle(Cell[][] puzzle, List<SolvingStrategy> strategiesInfo){
+    public SolvedPuzzle(Cell[][] puzzle, List<PuzzleSolvingStrategy> strategiesInfo){
         this.puzzle = puzzle;
         this.strategiesInfo = strategiesInfo;
     }
@@ -29,7 +29,7 @@ public class SolvedPuzzle {
         return solvedPuzzle;
     }
 
-    public List<SolvingStrategy> strategiesInfo(){
+    public List<PuzzleSolvingStrategy> strategiesInfo(){
         return strategiesInfo;
     }
 }

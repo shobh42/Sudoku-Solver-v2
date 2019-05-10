@@ -12,7 +12,7 @@ public class SudokuPuzzleGenerator {
         //Puzzle-9x9-0401.txt
         //Puzzle-9x9-0901
         //Puzzle-9x9-0101.txt
-        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-25x25-0903.txt");
+        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-9x9-0001.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
         final int PUZZLE_SIZE = Integer.valueOf(reader.readLine());
         if(!new PuzzleSizeValidator().isSizeIsValid(PUZZLE_SIZE)) {
@@ -61,7 +61,7 @@ public class SudokuPuzzleGenerator {
                     possibleValues.add(values[col].charAt(0));
                 }
 
-                Cell cell = new Cell(possibleValues);
+                Cell<Character> cell = new Cell(possibleValues);
                 puzzle[row][col] = cell;
             }
 
