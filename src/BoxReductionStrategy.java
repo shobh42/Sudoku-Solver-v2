@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -5,7 +8,7 @@ import java.util.Set;
  * When this happens, you know that the candidate MUST occur in that row or column because it can't appear anywhere else there,
  * so it CAN'T occur elsewhere in that box.
  */
-public class BoxReductionStrategy implements SolvingStrategy{
+public class BoxReductionStrategy extends PuzzleSolvingStrategy{
 
     private int count;
     private double totalTime;
@@ -16,44 +19,73 @@ public class BoxReductionStrategy implements SolvingStrategy{
         totalTime = 0;
     }
 
+    @Override
+    public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
+        System.out.println("Inside Box Reduction Strategy");
+        List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
+        int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
+        for(int row = 0; row < sudokuPuzzle.length; row+=sqrt){
+
+            for(int col = 0; col < sudokuPuzzle.length; col+=sqrt){
+
+                if(sudokuPuzzle[row][col].getSize() > 1){
+                    cellWithSizeOne.add(new CellCoordinate(row, col));
+                }
+            }
+        }
+
+        return cellWithSizeOne;
+    }
 
     @Override
-    public boolean solve(int size, Cell[][] puzzle) {
-        System.out.println("Inside Box Reduction Strategy");
-        stateChanged = false;
-        long startTime = System.currentTimeMillis();
-        for(int row = 0; row < size; row++){
+    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellWithCandidate, Cell[][] sudokuPuzzle) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
+        for(CellCoordinate cell: cellWithCandidate){
 
-            for(int col = 0; col < size; col++){
+            int row = cell.getRow();
+            int col = cell.getCol();
+            Object[] cand = sudokuPuzzle[row][col].getCandidates().toArray();
+            Character[] candidates = new Character[cand.length];
+            for (int temp = 0; temp < cand.length; temp++) {
+                candidates[temp] = (Character) cand[temp];
+            }
 
-                if(puzzle[row][col].getSize() > 1){
-                    //Character []values = (Character[]) puzzle[row][col].getCandidates().toArray();
-                    Object[] cand = puzzle[row][col].getCandidates().toArray();
-                    Character[] values = new Character[cand.length];
-                    for(int temp = 0; temp < cand.length; temp++){
-                        values[temp] = (Character) cand[temp];
-                    }
-                    for(int i = 0; i < values.length; i++){
-                        boolean blockHasValue = checkCandidateIsPresentInBlock(row, col, puzzle, values[i]);
-                        boolean otherRowHasValue = checkCandidateIsPresentInOtherRowExcludingCurrentBlock(row, col, puzzle, values[i]);
-                        boolean otherColHasValue = checkCandidateIsPresentInOtherColumnExcludingCurrentBlock(row, col, puzzle, values[i]);
+            for (int index = 0; index < candidates.length; index++) {
+                boolean blockHasValue = checkCandidateIsPresentInBlock(row, col, sudokuPuzzle, candidates[index]);
+                boolean otherRowHasValue = checkCandidateIsPresentInOtherRowExcludingCurrentBlock(row, col, sudokuPuzzle, candidates[index]);
+                boolean otherColHasValue = checkCandidateIsPresentInOtherColumnExcludingCurrentBlock(row, col, sudokuPuzzle, candidates[index]);
 
-                        if(blockHasValue && (!otherRowHasValue || !otherColHasValue)){
-                            if(!otherRowHasValue){
-                                removeTheValueFromTheBlockExcludingCandidateColumn(row, col, puzzle, values[i]);
-                            }else{
-                                removeTheValueFromTheBlockExcludingCandidateRow(row, col, puzzle, values[i]);
-                            }
-
-                            stateChanged = true;
-                        }
+                if(blockHasValue && (!otherRowHasValue || !otherColHasValue)){
+                    if(!otherRowHasValue){
+                        cellToUpdate = getTheCellFromTheBlockExcludingCandidateColumn(row, col, sudokuPuzzle, candidates[index]);
+                    }else{
+                        cellToUpdate = getTheCellFromTheBlockExcludingCandidateRow(row, col, sudokuPuzzle, candidates[index]);
                     }
                 }
             }
         }
 
-        long endTime   = System.currentTimeMillis();
-        totalTime+= (endTime - startTime);
+        return cellToUpdate;
+    }
+
+    @Override
+    public boolean removeTheCandidate(List<CellCoordinate> cellContainingCandidate, Cell[][] sudokuPuzzle) {
+        boolean stateChanged = false;
+        for (CellCoordinate cell: cellContainingCandidate){
+            int row = cell.getRow();
+            int col = cell.getCol();
+            if(sudokuPuzzle[row][col].getSize() == 1){
+                continue;
+            }
+
+            char candidate = (char) cell.getCandidate();
+            sudokuPuzzle[row][col].getCandidates().remove(candidate);
+            stateChanged = true;
+            if(sudokuPuzzle[row][col].getSize() == 1){
+                count++;
+            }
+        }
+
         return stateChanged;
     }
 
@@ -65,8 +97,8 @@ public class BoxReductionStrategy implements SolvingStrategy{
         return totalTime;
     }
 
-    private void removeTheValueFromTheBlockExcludingCandidateRow(int candidateRow, int candidateColumn, Cell[][] puzzle, char candidateToRemove) {
-
+    private List<CellCoordinate> getTheCellFromTheBlockExcludingCandidateRow(int candidateRow, int candidateColumn, Cell[][] puzzle, char candidateToRemove) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
         int size = puzzle.length;
         int sqrtOfSize = (int) Math.sqrt(size);
 
@@ -77,17 +109,17 @@ public class BoxReductionStrategy implements SolvingStrategy{
                 if(r1 != candidateRow){
                     Set <Character> possibleValues = puzzle[r1][c1].getCandidates();
                     if(possibleValues.contains(candidateToRemove)){
-                        stateChanged = true;
-                        possibleValues.remove(candidateToRemove);
-                        count++;
+                        cellToUpdate.add(new CellCoordinate(r1, c1, candidateToRemove));
                     }
-
                 }
             }
         }
+
+        return cellToUpdate;
     }
 
-    private void removeTheValueFromTheBlockExcludingCandidateColumn(int candidateRow, int candidateColumn, Cell[][] puzzle, char candidateToRemove) {
+    private List<CellCoordinate> getTheCellFromTheBlockExcludingCandidateColumn(int candidateRow, int candidateColumn, Cell[][] puzzle, char candidateToRemove) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
         int size = puzzle.length;
         int sqrtOfSize = (int) Math.sqrt(size);
 
@@ -99,14 +131,13 @@ public class BoxReductionStrategy implements SolvingStrategy{
                     Set <Character> possibleValues = puzzle[r1][c1].getCandidates();
 
                     if(possibleValues.contains(candidateToRemove)){
-                        stateChanged = true;
-                        possibleValues.remove(candidateToRemove);
-                        count++;
+                        cellToUpdate.add(new CellCoordinate(r1, c1, candidateToRemove));
                     }
-
                 }
             }
         }
+
+        return cellToUpdate;
     }
 
     private boolean checkCandidateIsPresentInOtherColumnExcludingCurrentBlock(int r, int c, Cell[][] puzzle, char valueToFind) {
@@ -161,4 +192,5 @@ public class BoxReductionStrategy implements SolvingStrategy{
     public String toString(){
         return "Box Reduction has eliminated " + count + " and has taken " + totalTime/1000;
     }
+
 }

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,7 +11,7 @@ import java.util.Set;
  * This means that you know that the candidate MUST occur in one of the two squares in the block, and because of that,
  * you can eliminate that candidate from any other cells in the row or column that the candidate is aligned on.
  */
-public class PointingPairStrategy implements SolvingStrategy {
+public class PointingPairStrategy extends PuzzleSolvingStrategy {
 
     private boolean stateChanged;
     private int count;
@@ -20,51 +22,79 @@ public class PointingPairStrategy implements SolvingStrategy {
         totalTime = 0;
     }
 
-    public int getCount() {
-        return count;
-    }
+    @Override
+    public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
+        System.out.println("Inside Pointing Pair Strategy");
+        List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
+        int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
+        for(int row = 0; row < sudokuPuzzle.length; row+=sqrt){
 
-    public double getTotalTime() {
-        return totalTime;
+            for(int col = 0; col < sudokuPuzzle.length; col+=sqrt){
+
+                if(sudokuPuzzle[row][col].getSize() > 1){
+                    cellWithSizeOne.add(new CellCoordinate(row, col));
+                }
+            }
+        }
+
+        return cellWithSizeOne;
     }
 
     @Override
-    public boolean solve(int size, Cell[][] puzzle) {
-        System.out.println("Inside Pointing Pair Strategy");
-        long startTime = System.currentTimeMillis();
-        for (int row = 0; row < size; row++) {
+    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellWithCandidate, Cell[][] sudokuPuzzle) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
+        for(CellCoordinate cell: cellWithCandidate){
 
-            for (int col = 0; col < size; col++) {
+            int row = cell.getRow();
+            int col = cell.getCol();
+            Object[] cand = sudokuPuzzle[row][col].getCandidates().toArray();
+            Character[] candidates = new Character[cand.length];
+            for (int temp = 0; temp < cand.length; temp++) {
+                candidates[temp] = (Character) cand[temp];
+            }
 
-                if(puzzle[row][col].getCandidates().size() > 1){
-                    Set<Character> candidates = puzzle[row][col].getCandidates();
-                    for (int i = 0; i < candidates.size() && candidates.size() != 1; i++) {
-                        char valueToCheck = (Character) candidates.toArray()[i];
-                        boolean blockHasValue = checkCandidateIsPresentInBlock(row, col, puzzle, valueToCheck);
-                        boolean rowHasValue = checkCandidateIsPresentInOtherRowExcludingCurrentBlock(row, col, puzzle, valueToCheck);
-                        boolean colHasValue = checkCandidateIsPresentInOtherColumnExcludingCurrentBlock(row, col, puzzle, valueToCheck);
+            for (int index = 0; index < candidates.length; index++) {
+                boolean blockHasValue = checkCandidateIsPresentInBlock(row, col, sudokuPuzzle, candidates[index]);
+                boolean otherRowHasValue = checkCandidateIsPresentInOtherRowExcludingCurrentBlock(row, col, sudokuPuzzle, candidates[index]);
+                boolean otherColHasValue = checkCandidateIsPresentInOtherColumnExcludingCurrentBlock(row, col, sudokuPuzzle, candidates[index]);
 
-                        if(!blockHasValue && (rowHasValue || colHasValue)) {
-
-                            if (rowHasValue) {
-                                removeTheCandidateFromRow(row, col, puzzle, valueToCheck);
-                            } else {
-                                removeTheCandidateFromColumn(row, col, puzzle, valueToCheck);
-                            }
-
-                            stateChanged = true;
-                        }
+                if(!blockHasValue && (otherRowHasValue || otherColHasValue)){
+                    if(!otherRowHasValue){
+                        cellToUpdate = getTheCandidateFromRow(row, col, sudokuPuzzle, candidates[index]);
+                    }else{
+                        cellToUpdate = removeTheCandidateFromColumn(row, col, sudokuPuzzle, candidates[index]);
                     }
                 }
             }
         }
 
-        long endTime = System.currentTimeMillis();
-        totalTime+= (endTime - startTime);
+        return cellToUpdate;
+    }
+
+    @Override
+    public boolean removeTheCandidate(List<CellCoordinate> cellContainingCandidate, Cell[][] sudokuPuzzle) {
+        boolean stateChanged = false;
+        for (CellCoordinate cell: cellContainingCandidate){
+
+            int row = cell.getRow();
+            int col = cell.getCol();
+            if(sudokuPuzzle[row][col].getSize() == 1){
+                continue;
+            }
+
+            Character candidate = (Character) cell.getCandidate();
+            sudokuPuzzle[row][col].getCandidates().remove(candidate);
+            stateChanged = true;
+            if(sudokuPuzzle[row][col].getSize() == 1){
+                count++;
+            }
+        }
+
         return stateChanged;
     }
 
-    private void removeTheCandidateFromColumn(int r, int c, Cell[][] puzzle, char valueToRemove) {
+    private List<CellCoordinate> removeTheCandidateFromColumn(int r, int c, Cell[][] puzzle, char valueToRemove) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
         int size = puzzle.length;
         int sqrtOfSize = (int) Math.sqrt(size);
 
@@ -73,16 +103,17 @@ public class PointingPairStrategy implements SolvingStrategy {
                 if (puzzle[r][col].getSize() > 1) {
                     Set<Character> possibleValues = puzzle[r][col].getCandidates();
                     if (possibleValues.contains(valueToRemove)) {
-                        stateChanged = true;
-                        possibleValues.remove(valueToRemove);
-                        count++;
+                        cellToUpdate.add(new CellCoordinate(r, col, valueToRemove));
                     }
                 }
             }
         }
+
+        return cellToUpdate;
     }
 
-    private void removeTheCandidateFromRow(int r, int c, Cell[][] puzzle, char valueToRemove) {
+    private List<CellCoordinate> getTheCandidateFromRow(int r, int c, Cell[][] puzzle, char valueToRemove) {
+        List<CellCoordinate> cellToUpdate = new ArrayList<>();
         int size = puzzle.length;
         int sqrtOfSize = (int) Math.sqrt(size);
 
@@ -92,13 +123,13 @@ public class PointingPairStrategy implements SolvingStrategy {
                 if (puzzle[row][c].getSize() > 1) {
                     Set<Character> possibleValues = puzzle[row][c].getCandidates();
                     if (possibleValues.contains(valueToRemove)) {
-                        stateChanged = true;
-                        possibleValues.remove(valueToRemove);
-                        count++;
+                        cellToUpdate.add(new CellCoordinate(row, c, valueToRemove));
                     }
                 }
             }
         }
+
+        return cellToUpdate;
     }
 
     private boolean checkCandidateIsPresentInOtherColumnExcludingCurrentBlock(int r, int c, Cell[][] puzzle, char valueToFind) {
@@ -152,5 +183,13 @@ public class PointingPairStrategy implements SolvingStrategy {
 
     public String toString(){
         return "Pointing Pair has eliminated " + count + " and has taken " + totalTime/1000;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public double getTotalTime() {
+        return totalTime;
     }
 }
