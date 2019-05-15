@@ -181,7 +181,7 @@ public class NakedPairStrategy extends PuzzleSolvingStrategy{
     }
 
     @Override
-    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellToUseForElimination, Cell[][] sudokuPuzzle) {
+    public List<CellCoordinate> findCandidateCellCoordinates(List<CellCoordinate> cellToUseForElimination, Cell[][] sudokuPuzzle) {
         List<CellCoordinate> cellToUpdate = new ArrayList<>();
         for(CellCoordinate cell: cellToUseForElimination) {
 

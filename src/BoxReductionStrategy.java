@@ -22,25 +22,25 @@ public class BoxReductionStrategy extends PuzzleSolvingStrategy{
     @Override
     public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
         System.out.println("Inside Box Reduction Strategy");
-        List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
+        List<CellCoordinate> cellWithSizeGreaterThanOne = new ArrayList<>();
         int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
         for(int row = 0; row < sudokuPuzzle.length; row+=sqrt){
 
             for(int col = 0; col < sudokuPuzzle.length; col+=sqrt){
 
                 if(sudokuPuzzle[row][col].getSize() > 1){
-                    cellWithSizeOne.add(new CellCoordinate(row, col));
+                    cellWithSizeGreaterThanOne.add(new CellCoordinate(row, col));
                 }
             }
         }
 
-        return cellWithSizeOne;
+        return cellWithSizeGreaterThanOne;
     }
 
     @Override
-    public List<CellCoordinate> checkCandidateIsPresent(List<CellCoordinate> cellWithCandidate, Cell[][] sudokuPuzzle) {
+    public List<CellCoordinate> findCandidateCellCoordinates(List<CellCoordinate> cellToUseForElimination, Cell[][] sudokuPuzzle) {
         List<CellCoordinate> cellToUpdate = new ArrayList<>();
-        for(CellCoordinate cell: cellWithCandidate){
+        for(CellCoordinate cell: cellToUseForElimination){
 
             int row = cell.getRow();
             int col = cell.getCol();
