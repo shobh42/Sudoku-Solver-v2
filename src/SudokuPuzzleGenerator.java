@@ -7,12 +7,12 @@ import java.util.Set;
 
 public class SudokuPuzzleGenerator {
 
-    public Cell[][] generatePuzzle(String filePath)
+    public SudokuPuzzle generatePuzzle(String filePath)
             throws IllegalCharacterException, IOException, InvalidPuzzleException {
         //Puzzle-9x9-0401.txt
         //Puzzle-9x9-0901
         //Puzzle-9x9-0101.txt
-        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-9x9-0001.txt");
+        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-16x16-0001.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
         final int PUZZLE_SIZE = Integer.valueOf(reader.readLine());
         if(!new PuzzleSizeValidator().isSizeIsValid(PUZZLE_SIZE)) {
@@ -20,8 +20,8 @@ public class SudokuPuzzleGenerator {
         }
 
         Set<Character> validCharacters = generateValidCandidates(PUZZLE_SIZE, reader);
-        Cell[][] puzzle = generatePuzzleUtil(PUZZLE_SIZE, reader, validCharacters);
-        boolean isPuzzleValid = new SudokuPuzzleValidator(validCharacters, puzzle, PUZZLE_SIZE).isValid();
+        SudokuPuzzle puzzle = generatePuzzleUtil(PUZZLE_SIZE, reader, validCharacters);
+        boolean isPuzzleValid = new SudokuPuzzleValidator(validCharacters, puzzle.getSudokuPuzzle(), PUZZLE_SIZE).isValid();
         if(!isPuzzleValid){
             throw new InvalidPuzzleException("Sudoku Puzzle is not valid");
         }
@@ -40,10 +40,11 @@ public class SudokuPuzzleGenerator {
         return validCharSet;
     }
 
-    private Cell[][] generatePuzzleUtil(int size, BufferedReader reader, Set<Character> validCharacters) throws IOException, IllegalCharacterException {
+    private SudokuPuzzle generatePuzzleUtil(int size, BufferedReader reader, Set<Character> validCharacters) throws IOException, IllegalCharacterException {
         Cell[][] puzzle = new Cell[size][size];
         String line;
         int row = 0;
+        int cellToBeFilled = 0;
         while ((line = reader.readLine()) != null){
             String []values = line.split(" ");
             for(int col = 0; col < size; col++){
@@ -53,6 +54,8 @@ public class SudokuPuzzleGenerator {
                     for(Character value : validCharacters){
                         possibleValues.add(value);
                     }
+
+                    cellToBeFilled++;
                 }else{
                     if(!validCharacters.contains(values[col].charAt(0))){
                         throw new IllegalCharacterException("Valid character list does not have "+ values[col]);
@@ -68,6 +71,6 @@ public class SudokuPuzzleGenerator {
             row++;
         }
 
-        return puzzle;
+        return new SudokuPuzzle(puzzle, cellToBeFilled);
     }
 }
