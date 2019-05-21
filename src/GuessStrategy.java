@@ -1,24 +1,25 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class BruteForceSolver {
+public class GuessStrategy {
 
-    private Cell[][] sudokuPuzzle;
+    private SudokuPuzzle sudokuPuzzle;
 
-    public BruteForceSolver(Cell[][] puzzle){
+    public GuessStrategy(SudokuPuzzle puzzle){
         this.sudokuPuzzle = puzzle;
     }
 
     public void solve(){
         System.out.println("Inside Brute Force");
-        int size = sudokuPuzzle.length;
+        Cell[][] puzzle = sudokuPuzzle.getSudokuPuzzle();
+        int size = puzzle.length;
         for(int row = 0; row < size; row++){
 
             for(int col = 0; col < size; col++){
 
-                Cell candidateCell = sudokuPuzzle[row][col];
+                Cell candidateCell = puzzle[row][col];
                 if(candidateCell.getSize() > 1){
-                    Object[] cand = sudokuPuzzle[row][col].getCandidates().toArray();
+                    Object[] cand = puzzle[row][col].getCandidates().toArray();
                     Character[] candidates = new Character[cand.length];
                     for(int temp = 0; temp < cand.length; temp++){
                         candidates[temp] = (Character) cand[temp];
@@ -27,7 +28,8 @@ public class BruteForceSolver {
                     for(int i = 0; i < candidates.length; i++){
                         Set<Character> s = new HashSet<>();
                         s.add(candidates[i]);
-                        sudokuPuzzle[row][col] = new Cell(s);
+                        puzzle[row][col] = new Cell(s);
+                        sudokuPuzzle.updateRemainingCell();
                         return;
                     }
                 }

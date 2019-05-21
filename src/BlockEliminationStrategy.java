@@ -14,20 +14,21 @@ public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
     }
 
     @Override
-    public List<CellCoordinate> findCellCoordinates(Cell[][] sudokuPuzzle) {
+    public List<CellCoordinate> findCellCoordinates(SudokuPuzzle sudokuPuzzle) {
         System.out.println("Inside Block Elimination");
         List<CellCoordinate> cellWithSizeOne = new ArrayList<>();
-        int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
-        for(int row = 0; row < sudokuPuzzle.length; row+=sqrt){
+        Cell[][] puzzle = sudokuPuzzle.getSudokuPuzzle();
+        int sqrt = (int) Math.sqrt(puzzle.length);
+        for(int row = 0; row < puzzle.length; row+=sqrt){
 
-            for(int col = 0; col < sudokuPuzzle.length; col+=sqrt){
+            for(int col = 0; col < puzzle.length; col+=sqrt){
 
                 for(int currentBlockRow = row; currentBlockRow < row + sqrt; currentBlockRow++){
 
                     for(int currentBlockCol = col; currentBlockCol < col + sqrt; currentBlockCol++){
 
-                        if(sudokuPuzzle[currentBlockRow][currentBlockCol].getSize() == 1){
-                            cellWithSizeOne.add(new CellCoordinate(row, col));
+                        if(puzzle[currentBlockRow][currentBlockCol].getSize() == 1){
+                            cellWithSizeOne.add(new CellCoordinate(currentBlockRow, currentBlockCol));
                         }
                     }
                 }
@@ -38,12 +39,13 @@ public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
     }
 
     @Override
-    public List<CellCoordinate> findCandidateCellCoordinates(List<CellCoordinate> cellToUseForElimination, Cell[][] sudokuPuzzle) {
+    public List<CellCoordinate> findCandidateCellCoordinates(List<CellCoordinate> cellToUseForElimination, SudokuPuzzle sudokuPuzzle) {
         List<CellCoordinate> cellToUpdate = new ArrayList<>();
-        int sqrt = (int) Math.sqrt(sudokuPuzzle.length);
+        Cell[][] puzzle = sudokuPuzzle.getSudokuPuzzle();
+        int sqrt = (int) Math.sqrt(puzzle.length);
         for(CellCoordinate cell: cellToUseForElimination){
 
-            char candidate = (Character) sudokuPuzzle[cell.getRow()][cell.getCol()].getCandidates().toArray()[0];
+            char candidate = (Character) puzzle[cell.getRow()][cell.getCol()].getCandidates().toArray()[0];
             int candidateRow = cell.getRow();
             int candidateCol = cell.getCol();
 
@@ -51,9 +53,9 @@ public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
 
                 for(int col = (candidateCol/sqrt) * sqrt; col < ((candidateCol/sqrt) * sqrt) + sqrt; col++){
 
-                    if(sudokuPuzzle[row][col].getCandidates().size() > 1
-                            && sudokuPuzzle[row][col].getCandidates().contains(candidate)){
-                        cellToUpdate.add(new CellCoordinate(row, candidateCol, candidate));
+                    if(puzzle[row][col].getCandidates().size() > 1
+                            && puzzle[row][col].getCandidates().contains(candidate)){
+                        cellToUpdate.add(new CellCoordinate(row, col, candidate));
                     }
                 }
             }
@@ -63,20 +65,22 @@ public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
     }
 
     @Override
-    public boolean removeTheCandidate(List<CellCoordinate> cellToUpdate, Cell[][] sudokuPuzzle) {
+    public boolean removeTheCandidate(List<CellCoordinate> cellToUpdate, SudokuPuzzle sudokuPuzzle) {
         boolean stateChanged = false;
+        Cell[][] puzzle = sudokuPuzzle.getSudokuPuzzle();
         for (CellCoordinate cell: cellToUpdate){
             int row = cell.getRow();
             int col = cell.getCol();
-            if(sudokuPuzzle[row][col].getSize() == 1){
+            if(puzzle[row][col].getSize() == 1){
                 continue;
             }
 
             char candidate = (char) cell.getCandidate();
-            sudokuPuzzle[row][col].getCandidates().remove(candidate);
+            puzzle[row][col].getCandidates().remove(candidate);
             stateChanged = true;
-            if(sudokuPuzzle[row][col].getSize() == 1){
+            if(puzzle[row][col].getSize() == 1){
                 count++;
+                sudokuPuzzle.updateRemainingCell();
             }
         }
 
