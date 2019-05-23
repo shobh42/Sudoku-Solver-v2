@@ -14,10 +14,10 @@ public class Driver {
            for(SolvedPuzzle puzzle : solvedPuzzle){
                printPuzzle(puzzle.getSolvedPuzzle());
            }
-            for(PuzzleSolvingStrategy strategy: solvedPuzzle.get(0).strategiesInfo()){
-                System.out.println(strategy.toString());
-                System.out.println();
-            }
+//           for(PuzzleSolvingStrategy strategy: solvedPuzzle.get(0).strategiesInfo()){
+//                System.out.println(strategy.toString());
+//                System.out.println();
+//            }
         } catch (InvalidPuzzleException e) {
             e.printStackTrace();
         } catch (IllegalCharacterException e) {

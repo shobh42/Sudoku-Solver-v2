@@ -28,4 +28,9 @@ public class SudokuPuzzle {
             state = SudokuState.SOLVED;
         }
     }
+
+    public void restoreRemainingCell(){
+        remainingCell+=1;
+        state = SudokuState.UNSOLVED;
+    }
 }

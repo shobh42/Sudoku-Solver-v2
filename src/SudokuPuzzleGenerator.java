@@ -7,21 +7,27 @@ import java.util.Set;
 
 public class SudokuPuzzleGenerator {
 
+    private Set<Character> validCharacters;
+
+    public Set<Character> getValidCharacters() {
+        return validCharacters;
+    }
+
     public SudokuPuzzle generatePuzzle(String filePath)
             throws IllegalCharacterException, IOException, InvalidPuzzleException {
         //Puzzle-9x9-0401.txt
         //Puzzle-9x9-0901
         //Puzzle-9x9-0101.txt
-        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-25x25-0101.txt");
+        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-16x16-0301.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
         final int PUZZLE_SIZE = Integer.valueOf(reader.readLine());
         if(!new PuzzleSizeValidator().isSizeIsValid(PUZZLE_SIZE)) {
             throw new InvalidPuzzleException("Puzzle size " + PUZZLE_SIZE + " is not a valid size");
         }
 
-        Set<Character> validCharacters = generateValidCandidates(PUZZLE_SIZE, reader);
+        validCharacters = generateValidCandidates(PUZZLE_SIZE, reader);
         SudokuPuzzle puzzle = generatePuzzleUtil(PUZZLE_SIZE, reader, validCharacters);
-        boolean isPuzzleValid = new SudokuPuzzleValidator(validCharacters, puzzle.getSudokuPuzzle(), PUZZLE_SIZE).isValid();
+        boolean isPuzzleValid = new SudokuPuzzleValidator(validCharacters, puzzle.getSudokuPuzzle()).isValid();
         if(!isPuzzleValid){
             throw new InvalidPuzzleException("Sudoku Puzzle is not valid");
         }

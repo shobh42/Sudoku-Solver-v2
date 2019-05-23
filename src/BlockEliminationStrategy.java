@@ -78,8 +78,8 @@ public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
             char candidate = (char) cell.getCandidate();
             puzzle[row][col].getCandidates().remove(candidate);
             stateChanged = true;
+            count++;
             if(puzzle[row][col].getSize() == 1){
-                count++;
                 sudokuPuzzle.updateRemainingCell();
             }
         }

@@ -63,8 +63,9 @@ public class RowEliminationStrategy extends PuzzleSolvingStrategy
             Character candidate = (Character) cell.getCandidate();
             puzzle[row][col].getCandidates().remove(candidate);
             stateChanged = true;
+            count++;
             if(puzzle[row][col].getSize() == 1){
-                count++;
+
                 sudokuPuzzle.updateRemainingCell();
             }
         }
