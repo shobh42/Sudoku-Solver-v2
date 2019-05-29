@@ -11,8 +11,10 @@ public class Driver {
         try {
            List<SolvedPuzzle> solvedPuzzle = new SudokuSolver().solve(null);
 
+            System.out.println("Printing Solution");
            for(SolvedPuzzle puzzle : solvedPuzzle){
                printPuzzle(puzzle.getSolvedPuzzle());
+               System.out.println("<><><><><><><><><><><><><>");
            }
 //           for(PuzzleSolvingStrategy strategy: solvedPuzzle.get(0).strategiesInfo()){
 //                System.out.println(strategy.toString());
@@ -35,7 +37,7 @@ public class Driver {
             }
             System.out.println();
         }
-
+        System.out.println("<><><><><><><><><><><><><>");
 
     }
 }
