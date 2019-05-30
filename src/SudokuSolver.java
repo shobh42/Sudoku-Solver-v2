@@ -32,6 +32,9 @@ public class SudokuSolver {
 
     private void solvePuzzle() {
         while(sudokuPuzzle.getState() == SudokuState.UNSOLVED){
+            if(sudokuPuzzle.getRemainingCell() == 0){
+                return;
+            }
             if(!solvePuzzleUsingStrategy()){
                 solvePuzzleUsingGuessStrategy();
             }
@@ -46,13 +49,13 @@ public class SudokuSolver {
 //            }
 //        }
 
-        //System.out.println("TIME TO BACKTRACK");
+        System.out.println("TIME TO BACKTRACK");
         //return;
     }
 
     private void solvePuzzleUsingGuessStrategy(){
         //GuessStrategy solver = new GuessStrategy(sudokuPuzzle);
-        System.out.println("Inside Brute Force");
+        System.out.println("Inside Brute Force wit state "+sudokuPuzzle.getState());
         //Cell[][] puzzle = sudokuPuzzle.getSudokuPuzzle();
         SudokuPuzzle sudokuPuzzleCopy = new SudokuPuzzle(sudokuPuzzle);
         Cell[][] puzzle = sudokuPuzzle.getSudokuPuzzle();
@@ -103,8 +106,9 @@ public class SudokuSolver {
                         //System.out.println("Restoring");
 
                         sudokuPuzzle = sudokuPuzzleCopy;
-                        puzzle = toRestore;
-                        //printPuzzle(puzzle);
+                        puzzle = sudokuPuzzle.getSudokuPuzzle();
+                        System.out.println("BackTracked and the state is "+ sudokuPuzzle.getState());
+                        printPuzzle(puzzle);
                         //sudokuPuzzle.restoreRemainingCell();
                     }
                 }
@@ -131,7 +135,7 @@ public class SudokuSolver {
 
             //printPuzzle();
             if(toPrint){
-                printPuzzle();
+                //printPuzzle();
                 try{
                     Thread.sleep(2500);
                 }catch (InterruptedException e){
@@ -139,15 +143,19 @@ public class SudokuSolver {
                 }
             }
 
-            if(sudokuPuzzle.getState() == SudokuState.SOLVED){
-                //printPuzzle();
+            if(sudokuPuzzle.getRemainingCell() == 0){
+                printPuzzle();
                 if(new SudokuPuzzleValidator(puzzleGenerator.getValidCharacters(), sudokuPuzzle.getSudokuPuzzle()).isValid()) {
                     count++;
                     solvedPuzzle.add(new SolvedPuzzle(sudokuPuzzle.getSudokuPuzzle(), solvingStrategies));
                     System.out.println("FOUND THE SOLUTION");
+                    sudokuPuzzle.setState(SudokuState.SOLVED);
+                    printPuzzle();
                     //return;
-                    break;
+
                 }
+
+                break;
             }
         }
 

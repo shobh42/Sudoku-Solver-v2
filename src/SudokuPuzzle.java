@@ -34,9 +34,13 @@ public class SudokuPuzzle {
 
     public void updateRemainingCell(){
         remainingCell-=1;
-        if(remainingCell == 0){
-            state = SudokuState.SOLVED;
-        }
+//        if(remainingCell == 0){
+//            state = SudokuState.SOLVED;
+//        }
+    }
+
+    public void setState(SudokuState state){
+        this.state = state;
     }
 
     public void restoreRemainingCell(){
