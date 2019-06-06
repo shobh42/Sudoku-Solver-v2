@@ -67,4 +67,8 @@ public class SudokuPuzzle {
 
         return copy;
     }
+
+    public void setPuzzle(Cell[][] newPuzzle){
+        this.sudokuPuzzle = getCopy(newPuzzle);
+    }
 }

@@ -18,7 +18,7 @@ public class SudokuPuzzleGenerator {
         //Puzzle-9x9-0401.txt
         //Puzzle-9x9-0901
         //Puzzle-9x9-0101.txt
-        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver\\src\\puzzles\\Puzzle-16x16-0301.txt");
+        File file = new File("C:\\Users\\Shobhit\\Desktop\\repos\\Sudoku-Solver-v2\\src\\puzzles\\Puzzle-16x16-0401.txt");
         BufferedReader reader = new BufferedReader(new FileReader(file));
         final int PUZZLE_SIZE = Integer.valueOf(reader.readLine());
         if(!new PuzzleSizeValidator().isSizeIsValid(PUZZLE_SIZE)) {
@@ -78,5 +78,5 @@ public class SudokuPuzzleGenerator {
         }
 
         return new SudokuPuzzle(puzzle, cellToBeFilled);
-    }
+     }
 }

@@ -45,6 +45,7 @@ public class BlockEliminationStrategy extends PuzzleSolvingStrategy {
         int sqrt = (int) Math.sqrt(puzzle.length);
         for(CellCoordinate cell: cellToUseForElimination){
 
+
             char candidate = (Character) puzzle[cell.getRow()][cell.getCol()].getCandidates().toArray()[0];
             int candidateRow = cell.getRow();
             int candidateCol = cell.getCol();
